@@ -6,3 +6,4 @@ A basic utility to 'swiftly' add simple logging for your application
 1. Console logging
 2. Writing logs to file
 3. Log message levels (debug, warning, error)
+4. Message buffering and flushing to avoid intense file access

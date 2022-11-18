@@ -51,7 +51,7 @@ extension MTLoggerTests {
         XCTAssertTrue(FileManager.default.fileExists(atPath: Configuration.logFile!.path))
     }
     
-    func test_writeMessageToFileSuccess() {
+    func test_writSingleeMessageToFile() {
         let currentDirectory = FileManager.default.currentDirectoryPath
         let currentDirectoryURL = URL(fileURLWithPath: currentDirectory, isDirectory: false)
         let logDirectory = currentDirectoryURL.appendingPathComponent("logs", isDirectory: true)
@@ -73,7 +73,7 @@ extension MTLoggerTests {
         XCTAssertTrue(size > 0)
     }
     
-    func test_writeMessageToFileSuccess_whenFlushBufferLengthIsGreaterThanOne() {
+    func test_writeMultipleMessagesToFile_whenFlushBufferLengthIsGreaterThanOne() {
         let currentDirectory = FileManager.default.currentDirectoryPath
         let currentDirectoryURL = URL(fileURLWithPath: currentDirectory, isDirectory: false)
         let logDirectory = currentDirectoryURL.appendingPathComponent("logs", isDirectory: true)
@@ -82,7 +82,7 @@ extension MTLoggerTests {
                 logDirectoryURL: logDirectory,
                 level: .debug,
                 print: true,
-                flushBufferLength: 2
+                flushBufferLength: 3
             )
         } catch {
             XCTFail(error.localizedDescription)
@@ -93,7 +93,8 @@ extension MTLoggerTests {
         var size = attributes[.size] as! UInt64
         XCTAssertTrue(size == 0)
         
-        logDebug("Unit testy 222!")
+        logDebug("Unit testy again!")
+        logDebug("Unit testy again and again 🕵️!")
         attributes = try! FileManager.default.attributesOfItem(atPath: Configuration.logFile!.path)
         size = attributes[.size] as! UInt64
         XCTAssertTrue(size > 0)
