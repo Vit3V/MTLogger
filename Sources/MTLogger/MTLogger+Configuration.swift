@@ -6,7 +6,7 @@ enum Configuration {
     static var logLevel = LogLevel.debug
     static var logPrint = true
     static var logFlushBufferLength: Int?
-    static var logBuffer: [String]?
+    static var logBuffer: [String] = []
     fileprivate static let logExtension = "log"
 }
 

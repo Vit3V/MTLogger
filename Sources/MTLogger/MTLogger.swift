@@ -19,10 +19,7 @@ func log(_ info: Any, prefix: String, function: String = #function, file: String
     if Configuration.logPrint {
         print(message)
     }
-    guard let file = Configuration.logFile else {
-        return
-    }
-    write(message: message, to: file)
+    write(message: message)
 }
 
 fileprivate func getFilename(from file: String) -> String {
@@ -41,16 +38,28 @@ fileprivate func getMethodName(from function: String) -> String {
     return functionString
 }
 
-fileprivate func write(message: String, to file: URL) {
-    let message = message + "\n"
-    guard let messageData = message.data(using: .utf8) else {
-        logLoggerError(LogError.failedToConvertMessageToDataUTF8)
+fileprivate func write(message: String) {
+    guard let file = Configuration.logFile else {
         return
     }
+    
+    let message = message + "\n"
+    Configuration.logBuffer.append(message)
+    
+    guard Configuration.logBuffer.count >= (Configuration.logFlushBufferLength ?? 0) else {
+        return
+    }
+    
     do {
         let handle = try FileHandle(forUpdating: file)
-        _ = try handle.seekToEnd()
-        try handle.write(contentsOf: messageData)
+        for message in Configuration.logBuffer {
+            guard let messageData = message.data(using: .utf8) else {
+                logLoggerError(LogError.failedToConvertMessageToDataUTF8)
+                continue
+            }
+            _ = try handle.seekToEnd()
+            try handle.write(contentsOf: messageData)
+        }
         try handle.close()
     } catch {
         Configuration.logFile = nil
@@ -62,4 +71,5 @@ fileprivate func write(message: String, to file: URL) {
         logLoggerError(LogError.failedToWriteMessageToLog)
         logLoggerError("The failed log file: \(file.path)")
     }
+    Configuration.logBuffer.removeAll()
 }
